@@ -1,0 +1,19 @@
+# Ignore Python bytecode
+__pycache__/
+*.py[cod]
+
+# Ignore virtual environments
+envk/
+.env/
+venv/
+ENV/
+env/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore model checkpoints if needed
+*.h5
+*.tflite
+*.ckpt
