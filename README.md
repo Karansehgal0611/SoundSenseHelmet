@@ -11,8 +11,9 @@
 
 ## 🏗️ Project Structure
 
+```markdown
 smart_helmet/ ├── client/ # Laptop audio streaming client │ └── audio_client.py ├── raspberry_pi/ # Core helmet system │ ├── audio/ # Audio processing │ │ ├── audio_server.py # UDP server │ │ ├── audio_processor.py # Chunk handling │ │ └── features.py # Spectrogram conversion │ ├── ml/ # Machine learning │ │ ├── inference.py # Real-time prediction │ │ ├── model_loader.py # TFLite integration │ │ └── models/ # Pretrained models │ ├── sensors/ # Sensor interfaces │ │ ├── force_sensor.py # Impact detection │ │ ├── gps.py # Location tracking │ │ └── mpu6050.py # Head tracking │ ├── output/ # User feedback │ │ ├── haptic.py # Vibration control │ │ └── visual.py # LED patterns │ ├── utils/ # Utilities │ │ ├── alerts.py # Notification system │ │ ├── logger.py # Logging config │ │ └── config.py # Hardware pin config ├── model_training/ # ML model development ├── tests/ # Unit tests │ ├── test_audio_streaming.py │ ├── test_ml_inference.py │ └── test_sensors.py ├── requirements.txt # Python dependencies └── README.md
-
+```
 
 ## 🚀 Key Features
 - **Real-Time Audio Classification**  
