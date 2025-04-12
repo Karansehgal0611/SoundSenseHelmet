@@ -5,9 +5,6 @@
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)  
 [![TensorFlow Lite](https://img.shields.io/badge/TensorFlow_Lite-2.10+-orange.svg)](https://www.tensorflow.org/lite)  
 
-<div align="center">
-  <img src="docs/helmet_demo.gif" width="400" alt="Demo">
-</div>
 
 ## 🏗️ Project Structure
 
