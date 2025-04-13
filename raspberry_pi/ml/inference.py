@@ -5,7 +5,7 @@ from raspberry_pi.audio.features import extract_spectrogram  # Relative import
 from .model_loader import ModelLoader     # Relative import
 
 class RealTimeInference:
-    def __init__(self, model_loader, threshold=0.70):
+    def __init__(self, model_loader, threshold=0.85):
         self.model = model_loader
         self.threshold = threshold
         self.logger = logging.getLogger(__name__)

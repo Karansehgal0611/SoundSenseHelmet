@@ -5,6 +5,7 @@ import numpy as np
 from queue import Queue
 import threading
 import logging
+import time
 
 # Add project root to path if needed
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -12,7 +13,9 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 from raspberry_pi.ml.model_loader import ModelLoader
 from raspberry_pi.ml.inference import RealTimeInference
 #from raspberry_pi.output.haptic import HapticFeedback
-#from raspberry_pi.output.visual import VisualFeedback
+from raspberry_pi.sensors.mpu6050 import HeadTracker
+
+from raspberry_pi.output.visual import LEDController
 
 class AudioServer:
     def __init__(self, port=5000, model_path="../ml/models/emergency_sound_classifier.tflite"):
@@ -28,8 +31,15 @@ class AudioServer:
         self.model = ModelLoader(model_path)
         self.inference = RealTimeInference(self.model)
         #self.haptic = haptic.HapticFeedback()
-        #self.visual = visual.VisualFeedback()
-        
+        self.head_tracker = HeadTracker(led_pin=27)
+        self.led = LEDController(17)
+
+        # Thread for head tracking
+        self.tracking_thread = threading.Thread(
+            target=self._track_head_loop,
+            daemon=True
+        )
+
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
@@ -51,10 +61,24 @@ class AudioServer:
                 if is_emergency:
                     self.logger.info(f"Emergency detected! Confidence: {confidence:.2f}")
                     #self.haptic.trigger()
-                    #self.visual.trigger()
+                    self.led.blink(times=5, speed=0.2)  
                     
             except Exception as e:
                 self.logger.error(f"Processing error: {e}")
+    
+    def _track_head_loop(self):
+        """Continuous head position monitoring"""
+        while self.running:
+            try:
+                # Head tracking runs independently
+                if self.head_tracker.check_head_tilt():
+                    self.logger.warning("Abnormal head position detected!")
+                    # LED controlled automatically by HeadTracker class
+                    
+                time.sleep(0.1)  # Reduce CPU usage
+                
+            except Exception as e:
+                self.logger.error(f"Head tracking error: {e}")
 
     def start(self):
         """Start the audio server"""
@@ -64,14 +88,21 @@ class AudioServer:
                 target=self._receive_loop,
                 daemon=True
             )
+            # Start audio processing
             self.receiver_thread.start()
             self.logger.info(f"Audio server started on port 5000")
+
+            # Start head tracking
+            self.tracking_thread.start()
+            self.logger.info("System started - audio and head tracking active")
 
     def stop(self):
         """Stop the audio server"""
         self.running = False
         self.udp_socket.close()
         #self.haptic.cleanup()
+        self.led.cleanup()
+        self.head_tracker.led.cleanup()
         self.logger.info("Audio server stopped")
 
 if __name__ == "__main__":
