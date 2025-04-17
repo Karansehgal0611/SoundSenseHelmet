@@ -12,9 +12,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 from raspberry_pi.ml.model_loader import ModelLoader
 from raspberry_pi.ml.inference import RealTimeInference
-#from raspberry_pi.output.haptic import HapticFeedback
-from raspberry_pi.sensors.mpu6050 import HeadTracker
-
+from raspberry_pi.output.haptic import HapticController
+#from raspberry_pi.sensors.mpu6050 import HeadTracker
 from raspberry_pi.output.visual import LEDController
 
 class AudioServer:
@@ -30,18 +29,27 @@ class AudioServer:
 
         self.model = ModelLoader(model_path)
         self.inference = RealTimeInference(self.model)
-        #self.haptic = haptic.HapticFeedback()
-        self.head_tracker = HeadTracker(led_pin=27)
+        self.vibrator = HapticController(motor_pin=12)  
+        #self.head_tracker = HeadTracker(led_pin=27)
         self.led = LEDController(17)
 
         # Thread for head tracking
-        self.tracking_thread = threading.Thread(
+        '''self.tracking_thread = threading.Thread(
             target=self._track_head_loop,
             daemon=True
-        )
+        )'''
 
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
+
+    def _handle_emergency(self, confidence):
+        """Centralized emergency response"""
+        print(f"EMERGENCY! Confidence: {confidence:.2f}")
+        self.led.blink(times=5, speed=0.2)
+        self.vibrator.emergency_sos()  # <-- Trigger vibration pattern
+        '''if self.head_tracker.check_head_tilt():
+            self.led.police_siren_pattern()''' 
+
 
     def _receive_loop(self):
         """Continuous audio reception and processing"""
@@ -59,14 +67,13 @@ class AudioServer:
                 
                 # Trigger outputs
                 if is_emergency:
-                    self.logger.info(f"Emergency detected! Confidence: {confidence:.2f}")
-                    #self.haptic.trigger()
-                    self.led.blink(times=5, speed=0.2)  
+                    self._handle_emergency(confidence)
+                    
                     
             except Exception as e:
                 self.logger.error(f"Processing error: {e}")
     
-    def _track_head_loop(self):
+    '''def _track_head_loop(self):
         """Continuous head position monitoring"""
         while self.running:
             try:
@@ -78,7 +85,7 @@ class AudioServer:
                 time.sleep(0.1)  # Reduce CPU usage
                 
             except Exception as e:
-                self.logger.error(f"Head tracking error: {e}")
+                self.logger.error(f"Head tracking error: {e}")'''
 
     def start(self):
         """Start the audio server"""
@@ -93,8 +100,8 @@ class AudioServer:
             self.logger.info(f"Audio server started on port 5000")
 
             # Start head tracking
-            self.tracking_thread.start()
-            self.logger.info("System started - audio and head tracking active")
+            #self.tracking_thread.start()
+            #self.logger.info("System started - audio and head tracking active")
 
     def stop(self):
         """Stop the audio server"""
@@ -102,7 +109,7 @@ class AudioServer:
         self.udp_socket.close()
         #self.haptic.cleanup()
         self.led.cleanup()
-        self.head_tracker.led.cleanup()
+        #self.head_tracker.led.cleanup()
         self.logger.info("Audio server stopped")
 
 if __name__ == "__main__":
