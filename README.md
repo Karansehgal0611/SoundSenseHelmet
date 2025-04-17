@@ -59,7 +59,11 @@ smart_helmet/
 - MEMS Microphone  
 - MPU6050 (Head tracking)  
 - GPS Module (NEO-6M)  
-- Vibration Motors  
+- Vibration Motors
+
+## System Architecture
+![Architecture](https://github.com/user-attachments/assets/6fe730f3-0878-4a35-9e2e-37efbefdb392)
+
 
 ## 🛠️ Setup
 ```bash
